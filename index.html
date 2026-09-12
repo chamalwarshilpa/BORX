@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borex - Smart Rental & Buy Platform with Self Pickup & Porter</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Grotesk"', 'monospace'],
+          },
+          colors: {
+            borex: {
+              cream: '#FBF3DD',
+              beige: '#E8D9B5',
+              silver: '#C7D2E8',
+              blue: '#0284C7',
+              blueSoft: '#E0F2FE',
+              blueHover: '#0369A1',
+              dark: '#1E232A'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FBF3DD] text-[#1E232A] selection:bg-[#0284C7] selection:text-white pb-16 md:pb-0">
+
+  <!-- ================= SIMPLIFIED TOP HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-[#ffffff] border-b border-[#E0D3B0] shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between gap-3">
+      
+      <!-- LEFT: THREE-DOT / MENU BUTTON + BOREX LOGO -->
+      <div class="flex items-center gap-3">
+        <!-- Three Dot Menu Button -->
+        <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-[#FBF3DD] hover:bg-[#E8D9B5] border border-[#E0D3B0] text-[#1E232A] transition-all flex items-center justify-center shadow-xs" title="Open Menu">
+          <i data-lucide="more-vertical" class="w-5 h-5 text-[#0284C7]"></i>
+        </button>
+
+        <!-- Logo -->
+        <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('catalog')">
+          <div class="w-9 h-9 rounded-xl bg-[#0284C7] flex items-center justify-center text-white font-black text-xl tracking-tighter shadow-sm">
+            b
+          </div>
+          <span class="text-2xl font-black tracking-tight text-[#0284C7]">borex</span>
+        </div>
+      </div>
+
+      <!-- CENTER: SEARCH BAR -->
+      <div class="flex-grow max-w-md hidden sm:block relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#57534E]"></i>
+        <input 
+          type="text" 
+          id="search-input" 
+          oninput="handleSearch(this.value)"
+          placeholder="Search cameras, drones, laptops, tools..." 
+          class="w-full bg-[#FBF3DD]/70 border border-[#E0D3B0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#1E232A] placeholder-[#57534E]/70 focus:outline-none focus:border-[#0284C7] focus:bg-white"
+        >
+      </div>
+
+      <!-- RIGHT: LOGIN / USER PROFILE & DYNAMIC LIST ITEM (AFTER LOGIN) -->
+      <div class="flex items-center gap-2.5">
+        
+        <!-- List Item Button (Appears when logged in) -->
+        <button id="header-list-btn" onclick="openListingModal()" class="hidden items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-[#E0F2FE] hover:bg-[#bae6fd] border border-[#0284C7]/30 text-[#0284C7] transition-all">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+          <span>List Item</span>
+        </button>
+
+        <!-- User Login / KYC Status Button -->
+        <button onclick="openKYCModal()" id="header-user-btn" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-sm transition-all">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i>
+          <span id="header-user-btn-text">Login / Sign Up</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile Search Bar (under header on small screens) -->
+    <div class="sm:hidden px-4 pb-3">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#57534E]"></i>
+        <input 
+          type="text" 
+          oninput="handleSearch(this.value)"
+          placeholder="Search cameras, drones, laptops, tools..." 
+          class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl pl-10 pr-4 py-2 text-xs focus:outline-none focus:border-[#0284C7]"
+        >
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= LEFT SIDEBAR DRAWER (THREE-DOT MENU) ================= -->
+  <div id="sidebar-drawer" class="fixed inset-0 z-50 pointer-events-none">
+    <!-- Backdrop Overlay -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="sidebar-overlay absolute inset-0 opacity-0 pointer-events-none transition-opacity"></div>
+    
+    <!-- Left Panel -->
+    <div id="sidebar-panel" class="sidebar-panel absolute top-0 left-0 bottom-0 w-[290px] sm:w-[320px] bg-[#ffffff] border-r border-[#E0D3B0] shadow-2xl flex flex-col justify-between p-5 pointer-events-auto z-10 overflow-y-auto">
+      
+      <div class="space-y-6">
+        
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between border-b border-[#E0D3B0] pb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#0284C7] flex items-center justify-center text-white font-black">b</div>
+            <span class="text-xl font-black text-[#0284C7]">borex menu</span>
+          </div>
+          <button onclick="toggleSidebar()" class="p-1 rounded-lg hover:bg-stone-100 text-[#57534E]">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Currency Selector in Menu -->
+        <div class="bg-[#FBF3DD] p-3 rounded-2xl border border-[#E0D3B0] space-y-1.5">
+          <label class="text-[11px] font-bold text-[#57534E] uppercase tracking-wider flex items-center gap-1">
+            <i data-lucide="globe" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+            Select Country & Currency
+          </label>
+          <select id="global-currency-select" onchange="handleCurrencyChange(this.value)" class="w-full bg-white border border-[#E0D3B0] rounded-xl px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:border-[#0284C7]">
+            <option value="INR" selected>🇮🇳 India (INR - ₹)</option>
+            <option value="USD">🇺🇸 United States (USD - $)</option>
+            <option value="EUR">🇪🇺 European Union (EUR - €)</option>
+            <option value="GBP">🇬🇧 United Kingdom (GBP - £)</option>
+            <option value="AED">🇦🇪 UAE (AED)</option>
+            <option value="CAD">🇨🇦 Canada (CAD - C$)</option>
+            <option value="AUD">🇦🇺 Australia (AUD - A$)</option>
+            <option value="JPY">🇯🇵 Japan (JPY - ¥)</option>
+          </select>
+        </div>
+
+        <!-- Feature Navigation Links -->
+        <nav class="space-y-1.5 text-xs font-bold">
+          <button onclick="switchView('catalog'); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-[#0284C7]"></i>
+            <span>Browse Catalog</span>
+          </button>
+
+          <button onclick="switchView('inspector'); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="scan-line" class="w-4 h-4 text-[#0284C7]"></i>
+            <span>AI Damage Detection Hub</span>
+          </button>
+
+          <button onclick="switchView('funds'); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="landmark" class="w-4 h-4 text-sky-600"></i>
+            <span>Escrow Fund & Deposit Checker</span>
+          </button>
+
+          <button onclick="switchView('bookings'); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="package-check" class="w-4 h-4 text-amber-600"></i>
+            <span>My Active Rentals Vault</span>
+          </button>
+
+          <button onclick="openKYCModal(); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+            <span>KYC ID & Address Verification</span>
+          </button>
+
+          <button onclick="openListingModal(); toggleSidebar();" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl hover:bg-[#E0F2FE] hover:text-[#0284C7] transition-all text-left">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600"></i>
+            <span>List an Item as Host</span>
+          </button>
+        </nav>
+
+        <!-- Terms & Conditions link -->
+        <div class="border-t border-[#E0D3B0] pt-4 space-y-2 text-xs">
+          <a href="#terms-section" onclick="toggleSidebar()" class="text-[#57534E] hover:text-[#0284C7] flex items-center gap-1.5 font-semibold">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>Terms & Conditions (95% Refund)</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- 24/7 Helpline in Menu -->
+      <div class="bg-[#FBF3DD] p-3 rounded-2xl border border-[#E0D3B0] space-y-1 text-xs">
+        <div class="font-bold text-[#1E232A]">24/7 Customer Support</div>
+        <div class="text-[11px] text-[#57534E]">📞 <a href="tel:+919876543210" class="text-[#0284C7] font-bold hover:underline">+91 98765 43210</a></div>
+        <div class="text-[11px] text-[#57534E]">📧 <a href="mailto:support.borex@gmail.com" class="hover:underline">support.borex@gmail.com</a></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6">
+
+    <!-- ================= VIEW 1: CATALOG (CATEGORIES FIRST) ================= -->
+    <section id="view-catalog" class="space-y-6 block">
+      
+      <!-- 1. USER-SELECTED DELIVERY / FULFILLMENT BANNER -->
+      <div class="bg-white border border-[#E0D3B0] rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-[#0284C7]">
+            <i data-lucide="map-pin" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-xs font-black text-[#1E232A]">Choose How You Want to Get the Item:</div>
+            <div class="text-[11px] text-[#57534E]">Select Self Pickup (Free) or hire Porter courier at checkout</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 self-stretch sm:self-auto">
+          <button onclick="setGlobalFulfillmentPreference('self')" id="pref-btn-self" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-extrabold border-2 border-[#0284C7] bg-[#E0F2FE] text-[#0284C7]">
+            🚶‍♂️ Self Pickup (Free)
+          </button>
+          <button onclick="setGlobalFulfillmentPreference('porter')" id="pref-btn-porter" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-extrabold border-2 border-[#E0D3B0] bg-white text-[#57534E]">
+            🚚 Porter Courier
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. CATEGORIES FIRST SECTION -->
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-black text-[#1E232A]">Categories</h2>
+          <span class="text-xs text-[#57534E]">Click a category to filter</span>
+        </div>
+
+        <!-- Categories Big Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3">
+          
+          <button onclick="setCategoryFilter('all')" class="category-card active p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-[#0284C7]">
+              <i data-lucide="grid" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">All Items</span>
+          </button>
+
+          <button onclick="setCategoryFilter('cameras')" class="category-card p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#FBF3DD] flex items-center justify-center text-[#0284C7]">
+              <i data-lucide="camera" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">Drones & Cameras</span>
+          </button>
+
+          <button onclick="setCategoryFilter('tools')" class="category-card p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#FBF3DD] flex items-center justify-center text-amber-600">
+              <i data-lucide="wrench" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">Power Tools</span>
+          </button>
+
+          <button onclick="setCategoryFilter('tech')" class="category-card p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#FBF3DD] flex items-center justify-center text-indigo-600">
+              <i data-lucide="laptop" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">Laptops & Tech</span>
+          </button>
+
+          <button onclick="setCategoryFilter('mobility')" class="category-card p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#FBF3DD] flex items-center justify-center text-emerald-600">
+              <i data-lucide="bike" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">E-Bikes</span>
+          </button>
+
+          <button onclick="setCategoryFilter('audio')" class="category-card p-3 rounded-2xl flex flex-col items-center justify-center text-center gap-1.5 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-[#FBF3DD] flex items-center justify-center text-purple-600">
+              <i data-lucide="speaker" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xs font-bold text-[#1E232A]">Audio & DJ</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- 3. RENTAL ITEMS GRID -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-black text-[#1E232A]">Featured Rental Equipment</h3>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#C7D2E8] text-[#1E232A]">95% Deposit Refund</span>
+          </div>
+
+          <!-- Quick Mode Switcher -->
+          <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#E0D3B0] text-xs">
+            <button onclick="setFilterMode('all')" id="mode-all" class="px-2.5 py-1 rounded-lg font-bold bg-[#0284C7] text-white">All</button>
+            <button onclick="setFilterMode('rent')" id="mode-rent" class="px-2.5 py-1 rounded-lg font-bold text-[#57534E]">Rent Hourly</button>
+            <button onclick="setFilterMode('buy')" id="mode-buy" class="px-2.5 py-1 rounded-lg font-bold text-[#57534E]">Buy Out</button>
+          </div>
+        </div>
+
+        <div id="catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+
+        <div id="catalog-empty" class="hidden text-center py-16 bg-white rounded-3xl border border-[#E0D3B0]">
+          <i data-lucide="package-search" class="w-12 h-12 mx-auto text-[#57534E]/50 mb-2"></i>
+          <h3 class="text-base font-bold">No rental items match your search</h3>
+          <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-[#0284C7] text-white">Reset Filters</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= VIEW 2: AI DAMAGE DETECTION STUDIO ================= -->
+    <section id="view-inspector" class="space-y-6 hidden">
+      <div class="bg-white border border-[#E0D3B0] rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-[#E0D3B0]">
+          <div>
+            <h2 class="text-2xl font-black text-[#1E232A]">AI Pre & Post Rental Damage Inspection</h2>
+            <p class="text-xs text-[#57534E] mt-0.5">YOLOv9 neural model verifies baseline check-in vs return media.</p>
+          </div>
+          <button onclick="switchView('catalog')" class="text-xs font-bold text-[#0284C7] hover:underline">← Back to Catalog</button>
+        </div>
+
+        <!-- Workbench -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-5">
+          <div class="lg:col-span-4 space-y-3">
+            <label class="text-xs font-bold text-[#57534E] block">Select Inspection Item</label>
+            <select id="inspector-item-select" onchange="handleInspectorItemChange(this.value)" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 text-xs font-bold">
+            </select>
+
+            <div class="space-y-2 pt-2">
+              <button onclick="loadInspectionScenario('clean')" id="scenario-btn-clean" class="w-full text-left p-3 rounded-xl border border-sky-400 bg-sky-50 text-xs font-bold text-[#0284C7] flex justify-between items-center">
+                <span>Clean Return (0% Damage)</span>
+                <span class="px-2 py-0.5 bg-[#0284C7] text-white rounded text-[10px]">95% Refund</span>
+              </button>
+              <button onclick="loadInspectionScenario('scratch')" id="scenario-btn-scratch" class="w-full text-left p-3 rounded-xl border border-amber-300 bg-amber-50 text-xs font-bold text-amber-800 flex justify-between items-center">
+                <span>Minor Scratch</span>
+                <span class="px-2 py-0.5 bg-amber-200 text-amber-900 rounded text-[10px]">Grade B</span>
+              </button>
+              <button onclick="loadInspectionScenario('severe')" id="scenario-btn-severe" class="w-full text-left p-3 rounded-xl border border-rose-300 bg-rose-50 text-xs font-bold text-rose-800 flex justify-between items-center">
+                <span>Severe Impact / Crack</span>
+                <span class="px-2 py-0.5 bg-rose-200 text-rose-900 rounded text-[10px]">Deduction</span>
+              </button>
+            </div>
+
+            <button id="run-ai-scan-btn" onclick="startAIScanAnimation()" class="w-full py-3 rounded-xl text-xs font-bold bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-md flex items-center justify-center gap-2">
+              <i data-lucide="scan" class="w-4 h-4"></i>
+              <span>Run AI Damage Analysis</span>
+            </button>
+          </div>
+
+          <div class="lg:col-span-8 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#FBF3DD] p-3 rounded-2xl border border-[#E0D3B0]">
+              <div>
+                <span class="text-[10px] font-bold text-[#57534E] block mb-1">Pre-Rental Baseline</span>
+                <img id="inspector-pre-img" src="" class="w-full h-52 object-cover rounded-xl border border-[#E0D3B0]">
+              </div>
+              <div class="relative">
+                <span class="text-[10px] font-bold text-[#57534E] block mb-1">Post-Rental Return</span>
+                <div class="relative w-full h-52 rounded-xl overflow-hidden border border-[#E0D3B0]">
+                  <img id="inspector-post-img" src="" class="w-full h-full object-cover">
+                  <div id="scanner-laser" class="hidden absolute left-0 right-0 h-1 bg-[#0284C7] shadow-[0_0_12px_#0284C7] z-30 pointer-events-none"></div>
+                  <div id="ai-bounding-boxes" class="absolute inset-0 z-30 pointer-events-none"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settlement Report -->
+            <div class="p-4 rounded-2xl bg-white border border-[#E0D3B0] space-y-2 text-xs">
+              <div class="flex justify-between items-center">
+                <h4 id="verdict-title" class="font-black text-[#0284C7] text-sm">95% Deposit Auto-Refunded in 24–48h</h4>
+                <div class="font-mono font-bold">Deposit: <span id="verdict-deposit-display">$150.00</span></div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+                <div class="p-2 bg-[#FBF3DD] rounded-lg">5% Escrow Cut: <strong id="verdict-deposit-fee" class="text-amber-700">-$7.50</strong></div>
+                <div class="p-2 bg-[#FBF3DD] rounded-lg">Damage Deduction: <strong id="verdict-deduction" class="text-rose-600">$0.00</strong></div>
+                <div class="p-2 bg-[#FBF3DD] rounded-lg">Net Refund (24-48h): <strong id="verdict-refund" class="text-[#0284C7]">$142.50</strong></div>
+                <div class="p-2 bg-[#FBF3DD] rounded-lg">Owner Rent Payout: <strong id="verdict-owner-payout" class="text-indigo-700">$72.00</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: ESCROW FUND CHECKER ================= -->
+    <section id="view-funds" class="space-y-6 hidden">
+      <div class="bg-white border border-[#E0D3B0] rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-[#E0D3B0]">
+          <div>
+            <h2 class="text-2xl font-black">Escrow Fund & Deposit Checker</h2>
+            <p class="text-xs text-[#57534E]">Trace 95% deposit refunds, 5% escrow cuts, and dual-party status.</p>
+          </div>
+          <button onclick="switchView('catalog')" class="text-xs font-bold text-[#0284C7] hover:underline">← Back to Catalog</button>
+        </div>
+
+        <div class="pt-5 space-y-4">
+          <div class="flex gap-2">
+            <input type="text" id="fund-search-input" value="RS-BK-9801" placeholder="Enter Booking ID..." class="flex-grow bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 text-xs font-mono font-bold">
+            <button onclick="lookupEscrowFund()" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#0284C7] text-white">Search</button>
+          </div>
+          <div id="fund-result-card" class="p-4 bg-[#FBF3DD] rounded-2xl border border-[#E0D3B0]"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 4: MY BOOKINGS VAULT ================= -->
+    <section id="view-bookings" class="space-y-6 hidden">
+      <div class="bg-white border border-[#E0D3B0] rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-[#E0D3B0]">
+          <div>
+            <h2 class="text-xl font-black">Active Rentals Vault</h2>
+            <p class="text-xs text-[#57534E]">Track your rented items and refund releases.</p>
+          </div>
+          <button onclick="switchView('catalog')" class="text-xs font-bold text-[#0284C7] hover:underline">← Back to Catalog</button>
+        </div>
+        <div id="bookings-list" class="space-y-3 pt-5"></div>
+      </div>
+    </section>
+
+    <!-- ================= TERMS & CONDITIONS ================= -->
+    <section id="terms-section" class="bg-white border border-[#E0D3B0] rounded-3xl p-6 shadow-sm space-y-3 text-xs">
+      <h3 class="text-sm font-black text-[#1E232A]">Borex Terms & Conditions</h3>
+      <div class="space-y-2 text-[#57534E] leading-relaxed">
+        <p>• <strong>Fulfillment:</strong> The renter chooses either <strong>Self Pickup (FREE)</strong> to collect the item directly from the owner, or books <strong>Porter</strong> courier service (charged separately).</p>
+        <p>• <strong>Deposit Refund (95% returned):</strong> 5% of the security deposit is retained as an escrow processing fee. The remaining 95% is automatically refunded within <strong>24–48 hours</strong> after dual-party verification.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FLOATING AI CHATBOT (BOREXBOT) ================= -->
+  <div class="fixed bottom-6 right-6 z-50">
+    <button onclick="toggleChatbot()" class="w-12 h-12 rounded-full bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 border-2 border-white">
+      <i data-lucide="message-square" class="w-5 h-5"></i>
+    </button>
+
+    <div id="chat-window" class="hidden absolute bottom-14 right-0 w-[320px] h-[450px] bg-white rounded-3xl overflow-hidden flex-col chat-window animate-scale-in border border-[#E0D3B0]">
+      <div class="bg-[#0284C7] text-white p-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center font-bold text-xs">B</div>
+          <span class="text-xs font-bold">BorexBot Assistant</span>
+        </div>
+        <button onclick="toggleChatbot()" class="text-white/80 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div id="chat-messages" class="flex-grow p-3 overflow-y-auto space-y-2 text-xs bg-[#FBF3DD]/30">
+        <div class="chat-bubble-bot p-2.5 rounded-xl">👋 Hi! I can help with Self Pickup, Porter delivery, or 24–48h deposit refunds.</div>
+      </div>
+
+      <form onsubmit="handleChatSubmit(event)" class="p-2 bg-white border-t border-[#E0D3B0] flex gap-1.5">
+        <input type="text" id="chat-input" placeholder="Ask anything..." class="flex-grow bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#0284C7]">
+        <button type="submit" class="p-1.5 rounded-xl bg-[#0284C7] text-white"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: KYC VERIFICATION ================= -->
+  <div id="modal-kyc" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border border-[#E0D3B0] rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-scale-in my-8">
+      <div class="px-5 py-3.5 border-b border-[#E0D3B0] flex items-center justify-between bg-[#FBF3DD]">
+        <h3 class="text-sm font-black">User Sign-Up & KYC Identity Verification</h3>
+        <button onclick="closeKYCModal()" class="text-[#57534E]"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div id="kyc-view-step-1" class="p-5 space-y-3 text-xs">
+        <div class="space-y-2">
+          <div><label class="font-bold block mb-1">Full Legal Name *</label><input type="text" id="kyc-name" value="Sahil Sharma" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"></div>
+          <div><label class="font-bold block mb-1">Email Address *</label><input type="email" id="kyc-email" value="sahil.sharma@example.com" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"></div>
+          <div><label class="font-bold block mb-1">Phone Number *</label><input type="tel" id="kyc-phone" value="+91 98765 43210" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"></div>
+        </div>
+        <button onclick="goToKYCStep(2)" class="w-full py-2.5 rounded-xl text-xs font-bold bg-[#0284C7] text-white">Next: Proof of Identity →</button>
+      </div>
+
+      <div id="kyc-view-step-2" class="p-5 space-y-3 text-xs hidden">
+        <div class="space-y-2">
+          <label class="font-bold block">Document Type (Aadhaar / Passport / DL)</label>
+          <div class="border-2 border-dashed border-[#E0D3B0] rounded-xl p-4 text-center cursor-pointer bg-[#FBF3DD]" onclick="document.getElementById('kyc-id-file').click()">
+            <div class="font-bold" id="kyc-id-file-label">Click to upload Proof of Identity</div>
+            <input type="file" id="kyc-id-file" accept="image/*" class="hidden" onchange="handleKYCIDUpload(event)">
+          </div>
+        </div>
+        <div class="flex gap-2"><button onclick="goToKYCStep(1)" class="w-1/3 py-2 rounded-xl bg-stone-100">Back</button><button onclick="goToKYCStep(3)" class="w-2/3 py-2 rounded-xl bg-[#0284C7] text-white font-bold">Next: Address Proof →</button></div>
+      </div>
+
+      <div id="kyc-view-step-3" class="p-5 space-y-3 text-xs hidden">
+        <div class="space-y-2">
+          <label class="font-bold block">Proof of Address (Utility Bill / Bank Statement)</label>
+          <div class="border-2 border-dashed border-[#E0D3B0] rounded-xl p-4 text-center cursor-pointer bg-[#FBF3DD]" onclick="document.getElementById('kyc-addr-file').click()">
+            <div class="font-bold" id="kyc-addr-file-label">Click to upload Proof of Address</div>
+            <input type="file" id="kyc-addr-file" accept="image/*" class="hidden" onchange="handleKYCAddressUpload(event)">
+          </div>
+        </div>
+        <div class="flex gap-2"><button onclick="goToKYCStep(2)" class="w-1/3 py-2 rounded-xl bg-stone-100">Back</button><button onclick="submitKYCVerification()" class="w-2/3 py-2 rounded-xl bg-[#0284C7] text-white font-bold">Complete & Verify Now ✓</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CHECKOUT ================= -->
+  <div id="modal-checkout" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border border-[#E0D3B0] rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl animate-scale-in my-8">
+      <div class="px-5 py-3 border-b border-[#E0D3B0] flex items-center justify-between bg-[#FBF3DD]">
+        <h3 class="text-sm font-black">Borex Rental Checkout</h3>
+        <button onclick="closeCheckoutModal()" class="text-[#57534E]"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <div class="flex gap-3 items-center p-3 rounded-2xl bg-[#FBF3DD] border border-[#E0D3B0]">
+          <img id="checkout-item-img" src="" class="w-16 h-16 rounded-xl object-cover border border-[#E0D3B0]">
+          <div>
+            <h4 id="checkout-item-title" class="font-black text-xs">Item</h4>
+            <div class="text-[11px] text-[#57534E]">📍 Hub: <span id="checkout-item-hub">Campus Hub</span></div>
+            <div class="font-bold text-[#0284C7]" id="checkout-hourly-rate">$18/hr</div>
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="space-y-2 p-3 bg-[#FBF3DD]/50 rounded-xl border border-[#E0D3B0]">
+          <div class="flex justify-between font-bold"><span>Rental Duration:</span><span id="duration-display" class="text-[#0284C7]">4 Hours</span></div>
+          <input type="range" id="duration-slider" min="1" max="72" value="4" oninput="handleDurationChange(this.value)" class="w-full h-2 accent-[#0284C7] cursor-pointer">
+        </div>
+
+        <!-- Fulfillment Choice -->
+        <div class="space-y-2">
+          <label class="font-bold block">Choose Fulfillment Method:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setFulfillmentMode('self')" id="fulfill-btn-self" class="fulfill-option-btn active p-2.5 rounded-xl border-2 border-[#0284C7] bg-[#E0F2FE] text-left">
+              <div class="font-bold text-[#0284C7]">🚶‍♂️ Self Pickup</div>
+              <div class="text-[10px] text-[#57534E]">Collect in person (FREE)</div>
+            </button>
+            <button type="button" onclick="setFulfillmentMode('porter')" id="fulfill-btn-porter" class="fulfill-option-btn p-2.5 rounded-xl border-2 border-[#E0D3B0] bg-white text-left">
+              <div class="font-bold text-amber-700">🚚 Porter Courier</div>
+              <div class="text-[10px] text-[#57534E]">Doorstep delivery (+₹150)</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Breakdown -->
+        <div class="p-3.5 bg-white rounded-xl border border-[#E0D3B0] space-y-1.5 divide-y divide-stone-100">
+          <div class="flex justify-between"><span>Base Rent (<span id="calc-hours-txt">4</span>h):</span><strong id="calc-base-rent">$72.00</strong></div>
+          <div class="flex justify-between pt-1"><span>Security Deposit:</span><strong id="calc-deposit">$150.00</strong></div>
+          <div class="flex justify-between pt-1 text-[#0284C7] font-bold"><span>• Auto-Refund (95% in 24–48h):</span><strong id="calc-deposit-net-refund">$142.50</strong></div>
+          <div class="flex justify-between pt-1"><span>Fulfillment:</span><strong id="calc-fulfill-cost" class="text-[#0284C7]">FREE</strong></div>
+          <div class="flex justify-between pt-1 text-sm font-black"><span>Total Payable:</span><strong id="calc-total-pay" class="text-[#0284C7] text-base">$222.00</strong></div>
+        </div>
+
+        <button onclick="processRentalBooking()" class="w-full py-3 rounded-2xl text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-md">
+          Confirm Rental & Authorize Escrow
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: LIST ITEM ================= -->
+  <div id="modal-listing" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border border-[#E0D3B0] rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-scale-in my-8">
+      <div class="px-5 py-3 border-b border-[#E0D3B0] flex items-center justify-between bg-[#FBF3DD]">
+        <h3 class="text-sm font-black">List an Item on Borex</h3>
+        <button onclick="closeListingModal()" class="text-[#57534E]"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form onsubmit="handleNewItemSubmit(event)" class="p-5 space-y-3 text-xs">
+        <div><label class="font-bold block mb-1">Item Title *</label><input type="text" id="new-item-title" required placeholder="e.g. Sony FX3 Cinema Kit" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="font-bold block mb-1">Category *</label><select id="new-item-category" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"><option value="cameras">Drones & Cameras</option><option value="tools">Power Tools</option><option value="tech">Laptops & Tech</option><option value="mobility">E-Bikes</option></select></div>
+          <div><label class="font-bold block mb-1">Hub Location *</label><input type="text" id="new-item-hub" value="Sector 62 Hub" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-medium"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="font-bold block mb-1">Hourly Rate *</label><input type="number" id="new-item-hourly" value="25" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-bold font-mono"></div>
+          <div><label class="font-bold block mb-1">Security Deposit *</label><input type="number" id="new-item-deposit" value="200" class="w-full bg-[#FBF3DD] border border-[#E0D3B0] rounded-xl px-3 py-2 font-bold font-mono"></div>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-[#0284C7] text-white">Publish Listing on Borex</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 bg-white border border-[#E0D3B0] text-[#1E232A] px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-[#0284C7]"></i>
+    <span id="toast-msg">Notification message</span>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

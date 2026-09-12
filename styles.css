@@ -1,0 +1,170 @@
+/* ==========================================================================
+   Borex - Clean, Lightweight Rental & Buy Platform
+   Color Palette:
+   - Vanilla Cream:  #FBF3DD (Main Page Background)
+   - Vanilla Beige:  #E8D9B5 (Cards, Accents & Soft Surfaces)
+   - Moon Silver:    #C7D2E8 (Secondary Highlights & Borders)
+   - Light Blue:     #0284C7 (Primary Accent & Action Buttons - Sky Blue)
+   - Light Blue Soft:#E0F2FE (Button Background & Badges)
+   - Deep Slate:     #1E232A (High Contrast Text)
+   ========================================================================== */
+
+:root {
+  --bg-cream: #FBF3DD;
+  --bg-beige: #E8D9B5;
+  --color-silver: #C7D2E8;
+  --color-blue: #0284C7;
+  --color-blue-hover: #0369A1;
+  --color-blue-soft: #E0F2FE;
+  --color-amber: #D97706;
+  --text-dark: #1E232A;
+  --text-muted: #57534E;
+  --border-subtle: #E0D3B0;
+  --card-shadow: 0 4px 14px -2px rgba(92, 75, 41, 0.08), 0 2px 6px -1px rgba(92, 75, 41, 0.05);
+}
+
+body {
+  background-color: var(--bg-cream);
+  color: var(--text-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-silver);
+}
+
+/* Light Blue Action Button */
+.btn-borex-blue {
+  background-color: var(--color-blue-soft);
+  border: 1.5px solid var(--color-blue);
+  color: var(--color-blue);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-borex-blue:hover {
+  background-color: var(--color-blue);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Product Card Elevation */
+.borex-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s ease;
+}
+.borex-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -4px rgba(92, 75, 41, 0.12), 0 0 0 1px #d6c69e;
+}
+
+/* Category Big Card (Categories First) */
+.category-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+.category-card:hover, .category-card.active {
+  border-color: var(--color-blue);
+  background-color: var(--color-blue-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+/* Left Slide-over Sidebar Drawer */
+.sidebar-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+}
+.sidebar-panel {
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar-open .sidebar-panel {
+  transform: translateX(0);
+}
+
+/* Laser Scan Animation for AI Damage Inspector */
+@keyframes scanLaser {
+  0% { top: 0%; opacity: 0.8; }
+  50% { top: 96%; opacity: 1; }
+  100% { top: 0%; opacity: 0.8; }
+}
+.animate-laser {
+  animation: scanLaser 2s ease-in-out infinite;
+}
+
+/* AI Detection Bounding Box */
+.ai-box-damage {
+  position: absolute;
+  border: 2px solid #e11d48;
+  background-color: rgba(225, 29, 72, 0.15);
+  border-radius: 6px;
+}
+.ai-box-clean {
+  position: absolute;
+  border: 2px solid #0284c7;
+  background-color: rgba(2, 132, 199, 0.12);
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.3);
+}
+.ai-box-label {
+  position: absolute;
+  top: -22px;
+  left: -2px;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.ai-label-damage {
+  background: #e11d48;
+  color: #ffffff;
+}
+.ai-label-clean {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+/* Modal Animations */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Chatbot Floating Widget */
+.chat-window {
+  box-shadow: 0 20px 40px -10px rgba(92, 75, 41, 0.25), 0 0 0 1px #d6c69e;
+}
+.chat-bubble-bot {
+  background-color: #FBF3DD;
+  border: 1px solid #E0D3B0;
+  color: #1E232A;
+}
+.chat-bubble-user {
+  background: #0284C7;
+  color: #ffffff;
+}
