@@ -35,10 +35,3 @@ A modern web application built with a **Blinkit-inspired UI**, featuring:
    - 📞 **Helpline**: `+91 98765 43210`
    - 📧 **Support Gmail**: `support.borex@gmail.com`
 
----
-
-## 🚀 How to Run & Share with Group Partners
-
-1. Open folder in VS Code: `C:\Users\sahil\.gemini\antigravity\scratch\rentsphere-ai`.
-2. Right-click `index.html` and select **"Open with Live Server"**.
-3. **To share**: Zip the folder and send it. It runs on any laptop or phone browser with zero external dependencies.
