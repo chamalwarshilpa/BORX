@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BORX — Rent Anything. Anywhere. Nearby.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" title="Switch Moonlight / Vanilla">🌙</button>
+
+<nav class="main-nav hidden" id="mainNav">
+  <div class="nav-brand" onclick="goTo('homeOrOwner')">BORX</div>
+  <div class="nav-links" id="navLinks"></div>
+</nav>
+
+<main id="appShell">
+
+  <section class="screen active" id="splashScreen">
+    <div class="splash-center">
+      <div class="moon-mark"></div>
+      <h1 class="brand">BORX</h1>
+      <p class="tagline">Rent anything. Anywhere. Nearby.</p>
+    </div>
+  </section>
+
+  <section class="screen" id="onboardScreen">
+    <div class="onboard-wrap">
+      <div class="onboard-slide" id="onboardSlide">
+        <div class="onboard-icon">📍</div>
+        <h2>Rent nearby</h2>
+        <p>Browse cameras, drones, laptops and more from people around you — no need to buy what you'll use once.</p>
+      </div>
+      <div class="dots" id="onboardDots"></div>
+      <div class="onboard-actions">
+        <button class="btn-outline" onclick="skipOnboarding()">Skip</button>
+        <button class="btn-primary" id="onboardNextBtn" onclick="nextOnboard()">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="roleScreen">
+    <div class="role-wrap">
+      <h2 class="popup-title">How do you want to use BORX?</h2>
+      <p class="popup-subtitle">You can switch anytime from your profile.</p>
+
+      <div class="role-grid">
+        <div class="role-card" onclick="selectRole('renter')">
+          <div class="role-icon">🔍</div>
+          <h3>I want to Rent</h3>
+          <p>Browse items near you and book what you need, instantly.</p>
+        </div>
+
+        <div class="role-card" onclick="selectRole('owner')">
+          <div class="role-icon">🗝️</div>
+          <h3>I want to List my Items</h3>
+          <p>Earn by renting out things you already own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="homeScreen">
+    <div class="home-header">
+      <div>
+        <p class="eyebrow-small">Browsing near</p>
+        <select id="locationSelect" class="location-select" onchange="changeLocation()"></select>
+      </div>
+      <button class="icon-btn" onclick="goTo('mapView')" title="Map view">🗺️</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search cameras, drones, bicycles…" oninput="renderListingGrid()" />
+    </div>
+
+    <div class="chip-row" id="categoryChips"></div>
+
+    <div class="filter-sort-row">
+      <button class="chip">⚙ Filters</button>
+      <button class="chip">↕ Sort: Nearest</button>
+    </div>
+
+    <h3 class="section-heading">🔥 Featured near you</h3>
+    <div class="featured-strip" id="featuredStrip"></div>
+
+    <h3 class="section-heading">All items in <span id="locationLabel">Delhi</span></h3>
+    <div class="listing-grid" id="listingGrid"></div>
+  </section>
+
+  <section class="screen" id="mapView">
+    <div class="page-head"><button class="icon-btn" onclick="goTo('homeScreen')">←</button><h2>Map view</h2></div>
+    <div class="map-stub">🗺️<p>Interactive map of nearby items would render here.</p></div>
+  </section>
+
+  <section class="screen" id="itemScreen">
+    <div class="page-head">
+      <button class="icon-btn" onclick="goTo('homeScreen')">←</button>
+      <h2>Item details</h2>
+      <button class="icon-btn" id="wishlistBtn" onclick="toggleWishlist()">🤍</button>
+    </div>
+
+    <div class="item-layout">
+      <div class="item-gallery" id="itemGallery"></div>
+
+      <div class="item-info">
+        <h2 id="itemTitle">Item title</h2>
+        <p class="owner-row">
+          <span id="itemOwner">Owned by —</span>
+          <span class="badge-verified">✓ Verified</span>
+          <span class="hint">· Responds in ~1hr</span>
+        </p>
+        <p class="item-desc" id="itemDesc">Description goes here.</p>
+        <p class="hint" id="itemCondition">Condition notes will show here.</p>
+
+        <div class="price-breakdown">
+          <div class="price-row"><span>Rental rate</span><span id="priceRate">₹0 / day</span></div>
+          <div class="price-row"><span>Security deposit</span><span id="priceDeposit">₹0</span></div>
+          <div class="price-row"><span>Platform fee</span><span id="priceFee">₹0</span></div>
+          <div class="price-row total"><span>Total due at pickup</span><span id="priceTotal">₹0</span></div>
+        </div>
+
+        <label class="field-label">Pick your dates</label>
+        <div class="date-row">
+          <input type="date" id="startDate" class="input" />
+          <input type="date" id="endDate" class="input" />
+        </div>
+        <p class="hint">Free cancellation up to 24 hours before pickup.</p>
+
+        <div class="action-row">
+          <button class="btn-outline" onclick="goTo('chatScreen')">💬 Chat with Owner</button>
+          <button class="btn-primary" onclick="rentNow()">Rent Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="chatScreen">
+    <div class="page-head"><button class="icon-btn" onclick="goTo('itemScreen')">←</button><h2>Chat with owner</h2></div>
+    <div class="chat-box">
+      <div class="chat-bubble theirs">Hi! Yes, it's available on your selected dates 🙂</div>
+      <div class="chat-bubble mine">Great, can we meet at the metro station?</div>
+    </div>
+    <div class="quick-replies">
+      <button class="chip" onclick="alert('Message sent')">Is this available on…</button>
+      <button class="chip" onclick="alert('Message sent')">Can we meet at…</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" class="input" placeholder="Type a message…" />
+      <button class="btn-primary small">Send</button>
+    </div>
+  </section>
+
+  <section class="screen" id="loginScreen">
+    <div class="screen-inner">
+      <div class="moon-mark small"></div>
+      <h2 class="brand">Sign in to BORX</h2>
+      <p class="subtitle" id="loginReason">One quick step before you book.</p>
+
+      <div id="phoneStep">
+        <label class="field-label">Phone number</label>
+        <input type="tel" id="phoneInput" class="input" placeholder="98765 43210" />
+        <label class="field-label">Referral code (optional)</label>
+        <input type="text" id="referralInput" class="input" placeholder="BORX-XXXX" />
+        <button class="btn-primary" onclick="sendOtp()">Send OTP</button>
+      </div>
+
+      <div id="otpStep" class="hidden">
+        <p class="hint" id="otpHint">OTP sent to your number.</p>
+        <label class="field-label">Enter OTP</label>
+        <input type="text" id="otpInput" class="input" placeholder="1234" maxlength="4" />
+        <button class="btn-primary" onclick="verifyOtp()">Verify &amp; Continue</button>
+      </div>
+
+      <div id="idStep" class="hidden">
+        <p class="hint">Optional: verify your government ID + a selfie to earn the "Verified" badge and get faster approvals.</p>
+        <div class="upload-box">📄 Tap to upload government ID</div>
+        <div class="upload-box">🤳 Tap to take a selfie</div>
+        <button class="btn-primary" onclick="finishIdVerification()">Continue</button>
+        <button class="btn-outline" onclick="finishIdVerification()">Skip for now</button>
+      </div>
+
+      <p class="divider"><span>or continue with</span></p>
+      <div class="social-row">
+        <button class="btn-social">Google</button>
+        <button class="btn-social">Apple</button>
+      </div>
+      <button class="btn-text" onclick="alert('Password reset link sent (demo)')">Forgot password?</button>
+      <p class="hint center">🔒 Biometric login (Face ID / fingerprint) available after your first sign-in.</p>
+    </div>
+  </section>
+
+  <section class="screen" id="paymentScreen">
+    <div class="page-head"><h2>Payment &amp; deposit</h2></div>
+    <div class="screen-inner no-top-pad">
+      <div class="price-breakdown">
+        <div class="price-row"><span>Rental rate</span><span id="payRate">₹0</span></div>
+        <div class="price-row"><span>Security deposit (refundable)</span><span id="payDeposit">₹0</span></div>
+        <div class="price-row"><span>Platform fee</span><span id="payFee">₹0</span></div>
+        <div class="price-row total"><span>Total</span><span id="payTotal">₹0</span></div>
+      </div>
+      <p class="hint">Your payment is held securely and only released to the owner after pickup is confirmed.</p>
+
+      <label class="field-label">Choose payment method</label>
+      <div class="pay-methods" id="payMethods"></div>
+
+      <button class="btn-primary" onclick="confirmPayment()">Confirm &amp; Pay</button>
+    </div>
+  </section>
+
+  <section class="screen" id="confirmScreen">
+    <div class="screen-inner center-content">
+      <div class="success-check">✓</div>
+      <h2>Booking confirmed!</h2>
+      <p class="subtitle" id="confirmSummary">Your item is reserved.</p>
+
+      <div class="qr-box">
+        <div class="qr-placeholder">▦</div>
+        <p class="hint">Show this QR to the owner at pickup to confirm handover</p>
+        <p class="hint">📍 Pickup location shared in chat</p>
+      </div>
+
+      <button class="btn-primary" onclick="goTo('bookingsScreen')">View my bookings</button>
+      <button class="btn-outline" onclick="goTo('homeScreen')">Back to browsing</button>
+    </div>
+  </section>
+
+  <section class="screen" id="activeRentalScreen">
+    <div class="page-head"><button class="icon-btn" onclick="goTo('bookingsScreen')">←</button><h2>Active rental</h2></div>
+    <div class="screen-inner no-top-pad">
+      <div class="countdown-box">
+        <p class="hint">Time remaining</p>
+        <p class="countdown-num">1d 6h</p>
+        <p class="hint">Due tomorrow, 6:00 PM</p>
+      </div>
+      <button class="btn-outline" onclick="alert('Extension request sent to owner (demo)')">Request extension</button>
+      <button class="btn-outline" onclick="alert('Connecting you to support (demo)')">Need help?</button>
+      <button class="btn-primary" onclick="goTo('returnScreen')">Start return process</button>
+    </div>
+  </section>
+
+  <section class="screen" id="returnScreen">
+    <div class="page-head"><button class="icon-btn" onclick="goTo('activeRentalScreen')">←</button><h2>Return item</h2></div>
+    <div class="screen-inner no-top-pad">
+      <div class="upload-box" onclick="alert('Camera opened (demo)')">📷 Scan QR with owner to confirm return</div>
+      <label class="field-label">Condition photos</label>
+      <div class="upload-box">📸 Upload return condition photos</div>
+      <p class="hint">Photos are compared automatically against pickup condition.</p>
+      <button class="btn-outline" onclick="alert('Damage report form opened (demo)')">Report damage instead</button>
+      <button class="btn-primary" onclick="goTo('reviewScreen')">Confirm return</button>
+    </div>
+  </section>
+
+  <section class="screen" id="reviewScreen">
+    <div class="page-head"><h2>Rate your rental</h2></div>
+    <div class="screen-inner no-top-pad">
+      <label class="field-label">How was the item?</label>
+      <div class="star-row" id="itemStars"></div>
+      <label class="field-label">How was the owner?</label>
+      <div class="star-row" id="ownerStars"></div>
+      <label class="field-label">Write a review (optional)</label>
+      <textarea class="input" rows="3" placeholder="Share details about your experience…"></textarea>
+      <button class="btn-primary" onclick="submitReview()">Submit review</button>
+    </div>
+  </section>
+
+  <section class="screen" id="bookingsScreen">
+    <div class="page-head"><h2>My Bookings</h2></div>
+    <div class="list-pad" id="bookingsList"></div>
+  </section>
+
+  <section class="screen" id="wishlistScreen">
+    <div class="page-head"><h2>Wishlist</h2></div>
+    <div class="listing-grid list-pad" id="wishlistGrid"></div>
+  </section>
+
+  <section class="screen" id="profileScreen">
+    <div class="page-head"><h2>Profile</h2></div>
+    <div class="screen-inner no-top-pad">
+      <div class="profile-head">
+        <div class="avatar">U</div>
+        <div>
+          <h3 id="profileName">BORX User</h3>
+          <p class="hint" id="profileRole">Renter account</p>
+        </div>
+      </div>
+      <div class="profile-section">
+        <p class="field-label">Rental history</p>
+        <p class="hint">Your past rentals (as renter) show up in Bookings.</p>
+      </div>
+      <div class="profile-section">
+        <p class="field-label">Saved payment methods</p>
+        <p class="hint">UPI, cards and wallets you've used before.</p>
+      </div>
+      <div class="profile-section">
+        <p class="field-label">Notification preferences</p>
+        <label class="toggle-row"><input type="checkbox" checked /> Push notifications</label>
+        <label class="toggle-row"><input type="checkbox" checked /> Email</label>
+        <label class="toggle-row"><input type="checkbox" /> SMS</label>
+      </div>
+      <button class="btn-outline" onclick="switchRole()">Switch role</button>
+      <button class="btn-outline" onclick="logout()">Log out</button>
+    </div>
+  </section>
+
+  <section class="screen" id="ownerScreen">
+    <div class="owner-header">
+      <h2>Owner Dashboard</h2>
+      <button class="icon-btn" onclick="switchRole()">⇄</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><p class="stat-num" id="statListings">0</p><p class="stat-label">Listings</p></div>
+      <div class="stat-card"><p class="stat-num" id="statBookings">0</p><p class="stat-label">Booking requests</p></div>
+      <div class="stat-card"><p class="stat-num" id="statEarnings">₹0</p><p class="stat-label">Earnings</p></div>
+    </div>
+
+    <div class="owner-tabs">
+      <button class="tab-btn active" data-tab="myListingsTab" onclick="switchTab('myListingsTab', this)">My Listings</button>
+      <button class="tab-btn" data-tab="addListingTab" onclick="switchTab('addListingTab', this)">Add New</button>
+      <button class="tab-btn" data-tab="earningsTab" onclick="switchTab('earningsTab', this)">Earnings</button>
+    </div>
+
+    <div class="tab-panel" id="myListingsTab">
+      <div id="ownerListingList"></div>
+    </div>
+
+    <div class="tab-panel hidden" id="addListingTab">
+      <label class="field-label">Item title</label>
+      <input type="text" id="newTitle" class="input" placeholder="e.g. Canon EOS R6" />
+
+      <label class="field-label">Category</label>
+      <select id="newCategory" class="input">
+        <option>Camera</option><option>Drone</option><option>Laptop</option>
+        <option>Gaming Console</option><option>Bicycle</option><option>Projector</option>
+      </select>
+
+      <label class="field-label">Pricing tiers</label>
+      <div class="price-tier-row">
+        <div><label class="field-label small">Hourly ₹</label><input type="number" id="newPriceHour" class="input" placeholder="80" /></div>
+        <div><label class="field-label small">Daily ₹</label><input type="number" id="newPrice" class="input" placeholder="500" /></div>
+        <div><label class="field-label small">Weekly ₹</label><input type="number" id="newPriceWeek" class="input" placeholder="2800" /></div>
+      </div>
+
+      <label class="field-label">Security deposit (₹)</label>
+      <input type="number" id="newDeposit" class="input" placeholder="2000" />
+
+      <label class="field-label">Description &amp; condition notes</label>
+      <textarea id="newDesc" class="input" rows="3" placeholder="Condition, accessories included, pickup notes…"></textarea>
+
+      <div class="upload-box">📷 Tap to add photos</div>
+      <label class="toggle-row"><input type="checkbox" checked /> Allow instant booking (skip approval)</label>
+
+      <button class="btn-primary" onclick="addListing()">Publish listing</button>
+    </div>
+
+    <div class="tab-panel hidden" id="earningsTab">
+      <div class="price-breakdown">
+        <div class="price-row"><span>This month</span><span>₹0</span></div>
+        <div class="price-row"><span>Pending payout</span><span>₹0</span></div>
+        <div class="price-row total"><span>Total earned</span><span>₹0</span></div>
+      </div>
+      <button class="btn-outline" onclick="alert('Withdrawal requested (demo)')">Withdraw to bank</button>
+    </div>
+  </section>
+
+  <section class="screen" id="ownerBookingsScreen">
+    <div class="page-head"><h2>Booking Requests</h2></div>
+    <div class="list-pad" id="ownerBookingsList"></div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
