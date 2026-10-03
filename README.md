@@ -1,37 +1,73 @@
-# Borex 📦✨
-### Smart Peer-to-Peer Rental Platform with Self Pickup & Porter Delivery
+# BORX — Rent Anything. Anywhere. Nearby.
 
-A modern web application built with a **Blinkit-inspired UI**, featuring:
-- **Color Palette**: Vanilla Cream (`#FBF3DD`), Vanilla Beige (`#E8D9B5`), Moon Silver (`#C7D2E8`), and Accent Green (`#0C831F`).
-- **Fulfillment**: **Self Pickup** (Free - ₹0) or **Porter Courier Delivery** (Charged separately based on distance).
+BORX is a peer-to-peer rental marketplace designed to make renting and lending products simple, convenient, and accessible.
 
----
+Users can explore nearby rental items such as cameras, electronics, gaming devices, laptops, bicycles, and other rentable products. Owners can list their products for rent, while renters can discover, view, and book items based on their requirements.
 
-## 🌟 Key Features
+## Project Overview
 
-1. **Fulfillment Modes**:
-   - 🚶‍♂️ **Self Pickup (FREE)**: The renter collects the item directly from the owner's hub/address in person.
-   - 🚚 **Porter Courier (Charged Separately)**: The renter can opt to book a Porter 2-Wheeler / 3-Wheeler courier for doorstep pickup and dropoff. The Porter fare is clearly itemized at checkout.
+BORX aims to connect product owners and renters through a user-friendly digital rental platform.
 
-2. **5% Deposit Escrow Fee & Automated 24–48h Refund**:
-   - When an item is returned clean, **5% of the security deposit is retained as an escrow processing fee**, and **95% is automatically refunded** within **24–48 hours** once both owner and renter dual-verify the condition.
+The platform focuses on:
+- Easy product discovery
+- Location-based rental listings
+- Product listing for owners
+- Secure user authentication
+- Rental booking management
+- Owner and renter workflows
+- Simple and user-friendly interface
 
-3. **Multi-Country Dynamic Currency Conversion**:
-   - 🇮🇳 `INR (₹)`, 🇺🇸 `USD ($)`, 🇪🇺 `EUR (€)`, 🇬🇧 `GBP (£)`, 🇦🇪 `AED`, 🇨🇦 `CAD`, 🇦🇺 `AUD`, 🇯🇵 `JPY`.
+## Key Features
 
-4. **Multi-Step KYC Identity & Address Verification**:
-   - **Step 1**: Personal profile & country.
-   - **Step 2**: Government ID Proof (Aadhaar Card, Passport, Driving License) with simulated OCR match.
-   - **Step 3**: Proof of Current Address (Utility Bill, Bank Statement, Rent Agreement) with simulated geo-location check.
+- User onboarding and role selection
+- Renter and Owner flows
+- Location-based product discovery
+- Product categories
+- Product details and rental pricing
+- Wishlist
+- Rental booking flow
+- OTP-based verification
+- Owner listing management
+- Booking management
+- Payment flow
+- Review and rating system
+- Responsive user interface
 
-5. **AI Damage Detection Studio**:
-   - YOLOv9 computer vision neural model comparing Pre-Rental check-in baseline vs. Post-Rental return photo/video.
-   - Laser scan animation and bounding boxes for scratches/cracks.
+## Technology Stack
 
-6. **Escrow Fund Status Checker**:
-   - Search by Booking ID or UPI reference to check live escrow fund status and refund countdown timer.
+### Frontend
+- HTML
+- CSS
+- JavaScript
 
-7. **24/7 Helpline & Official Gmail**:
-   - 📞 **Helpline**: `+91 98765 43210`
-   - 📧 **Support Gmail**: `support.borex@gmail.com`
+### Backend
+- Node.js
+- Express.js
 
+### Database
+- PostgreSQL
+- Sequelize
+
+### Development Tools
+- Visual Studio Code
+- Git & GitHub
+
+## Project Structure
+
+```text
+BORX/
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   └── server.js
+│
+├── index.html
+├── package.json
+└── README.md
